@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer,String
+from sqlalchemy import Column, Integer,String,orm
 
 from app.models.base import Base
 
@@ -15,3 +15,16 @@ class Book(Base):
     isbn = Column(String(15), nullable=False, unique=True)
     summary = Column(String(1000))
     image = Column(String(50))
+
+
+
+    @orm.reconstructor
+    def __init__(self):
+        super().__init__()
+        self.fields = ['id', 'title', 'author', 'binding',
+                  'publisher',
+                  'price', 'pages', 'pubdate', 'isbn',
+                  'summary',
+                  'image']
+
+

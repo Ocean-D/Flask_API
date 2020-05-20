@@ -1,21 +1,45 @@
 
 
 
-class Scope:
-    def add(self,other):
-        self.allow_api = self.allow_api + other.allow_api
+class Scope(object):
+    allow_api=[]
+    allow_module = []
+    forbidden = []
 
-class AdminScope(Scope):
-    allow_api = ['v1.super_get_user']
-    def __init__(self):
-        self.add(UserScope())
 
+    def __add__(self, other):
+        self.allow_api = self.allow_api+other.allow_api
+        self.allow_api = list(set(self.allow_api))
+
+        self.allow_module = self.allow_module + other.allow_module
+        self.allow_module = list(set(self.allow_module))
+
+        self.forbidden = self.forbidden+other.forbidden
+        self.forbidden = list(set(self.forbidden))
 
 
 
 
 class UserScope(Scope):
-    allow_api = ['v1.A','v1.B','v1.super_get_user']
+    # allow_api = ['v1.user+get_user','v1.user+delete_user']
+    # allow_module = []
+    forbidden = ['v1.user+super_get_user','v1.user+super_delete_user']
+    def __init__(self):
+        self + AdminScope()
+
+
+
+
+
+class AdminScope(Scope):
+    # allow_api = ['v1.user+super_get_user','v1.user+super_delete_user']
+    allow_module = ['v1.user']
+    def __init__(self):
+        pass
+        # self+Userscope()
+
+
+
 
 
 
@@ -28,9 +52,15 @@ class UserScope(Scope):
 def is_in_scope(scope,endpoint):
     #反射
     #scope是个字符串
-    gl = globals()
-    # scope = globals()[scope]()
+    # gl = globals()
+    scope = globals()[scope]()
+    splits = endpoint.split('+')
+    red_name = splits[0]
+    if endpoint in scope.forbidden:
+        return False
     if endpoint in scope.allow_api:
+        return True
+    if red_name in scope.allow_module:
         return True
     else:
         return False

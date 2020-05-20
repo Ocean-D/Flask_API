@@ -12,7 +12,9 @@ api = Redprint('book')
 def search():
     form = SearchForm().validate_for_api()
     q = '%'+form.q.data+'%'
-    books = Book.query.filter(or_(Book.title.like(q),Book.publisher.like(q))).all()
+    books = Book.query.filter(or_(Book.title.like(q),
+                                  Book.publisher.like(q))).all()
+    books = [book.hide() for book in books]
     return jsonify(books)
 
 @api.route('/<isbn>/detail')

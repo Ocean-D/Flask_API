@@ -47,3 +47,5 @@ class UserEmailForm(ClientForm):
 
 class SearchForm(BaseForm):
     q = StringField(validators=[DataRequired()])
+class TokenForm(BaseForm):
+    token = StringField(validators=[DataRequired()])
